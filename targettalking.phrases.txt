@@ -1,0 +1,8 @@
+"Phrases"
+{
+	"Warning"
+	{
+		"en"	"You are speaking over the warden too often"
+		"fr"	"Vous parlez en même temps que le gardien trop souvent"
+	}
+}

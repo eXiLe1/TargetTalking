@@ -1,4 +1,5 @@
 #include <sourcemod>
+#include <sdktools>
 #include <voiceannounce_ex>
 #include <warden>
 #pragma newdecls required
@@ -6,7 +7,7 @@
 bool g_bIsClientSpeaking[MAXPLAYERS+1];
 bool g_bIsWardenSpeaking;
 
-int g_WarningCounter;
+int g_WarningCounter[MAXPLAYERS+1];
 
 ConVar g_cvEnabled;
 ConVar g_cvShowWarning;
@@ -16,7 +17,7 @@ public Plugin myinfo =
 	name = "Target Talking",
 	author = "eXiLe",
 	description = "Plugin for admins to target players who are talking (Made for JailBreak)",
-	version = "1.0",
+	version = "1.2",
 	url = "TBD"
 };
 
@@ -42,14 +43,14 @@ public void OnPluginEnd()
 }
 public void onMapStart()
 {
-	if(!g_cvEnabled)
+	if(!g_cvEnabled.BoolValue)
 		return;
 }
 
 public void OnClientPutInServer(int client)
 {
 	g_bIsClientSpeaking[client] = false;
-    g_bIsWardenSpeaking = false;
+	g_WarningCounter[client] = 0;
 }
 
 public void OnClientSpeakingEx(int client)
@@ -67,12 +68,13 @@ public void OnClientSpeakingEx(int client)
 	if (warden_iswarden(client))
 	{
 		g_bIsWardenSpeaking = true;
+		return;
 	}	
 	
-	if (g_cvShowWarning != 0 && g_bIsWardenSpeaking && g_bIsClientSpeaking[client])
+	if (g_cvShowWarning.IntValue != 0 && g_bIsWardenSpeaking && g_bIsClientSpeaking[client])
 	{
-		g_WarningCounter = g_WarningCounter++
-		if (g_WarningCounter == g_cvShowWarning)
+		g_WarningCounter[client]++;
+		if (g_WarningCounter[client] == g_cvShowWarning.IntValue)
 		{
 			PrintHintText(client, "%t", "Warning");
 		}
@@ -91,30 +93,29 @@ public void OnClientSpeakingEnd(int client)
 
 public bool DoTalking(const char[] pattern, Handle clients)
 {
-	int client = GetNativeCell(1);
 	for (int i = 1; i <= MaxClients; i++)
 	{
-		if (!warden_iswarden(client) && g_bIsWardenSpeaking == true && g_bIsClientSpeaking[client] == true)
+		if (!warden_iswarden(i) && g_bIsClientSpeaking[i])
 			PushArrayCell(clients, i);
 	}
 }
 
 public bool DoTalkingct(const char[] pattern, Handle clients)
 {
-	int client = GetNativeCell(1);
+	int client;
 	for (int i = 1; i <= MaxClients; i++)
 	{
-		if (!warden_iswarden(client) && g_bIsWardenSpeaking == true && g_bIsClientSpeaking[client] == true && GetClientTeam(client) == 3)
+		if (!warden_iswarden(i) && g_bIsClientSpeaking[i] && GetClientTeam(client) == 3)
 			PushArrayCell(clients, i);
 	}
 }
 
 public bool DoTalkingt(const char[] pattern, Handle clients)
 {
-	int client = GetNativeCell(1);
+	int client;
 	for (int i = 1; i <= MaxClients; i++)
 	{
-		if (!warden_iswarden(client) && g_bIsWardenSpeaking && g_bIsClientSpeaking[client] && GetClientTeam(client) == 2)
+		if (!warden_iswarden(i) && g_bIsClientSpeaking[i] && GetClientTeam(client) == 2)
 			PushArrayCell(clients, i);
 	}
 }

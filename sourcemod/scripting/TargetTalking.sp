@@ -17,7 +17,7 @@ public Plugin myinfo =
 	author = "eXiLe",
 	description = "Plugin for admins to target players who are talking (Made for JailBreak)",
 	version = "1.2",
-	url = "TBD"
+	url = "https://github.com/eXiLe1/TargetTalking"
 };
 
 public void OnPluginStart()
